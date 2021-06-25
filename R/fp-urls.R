@@ -124,7 +124,7 @@ fp_get_ranking_data <- function(url, pos) {
   fpdf <- fpdf[ , !junk_cols]
 
   junk_rows <- grepl("\r|\n|function\\(\\)|}\\);|&nbsp", fpdf$player_info)
-  fpdf <- fpdf[!junk_rows, ]
+  #fpdf <- fpdf[!junk_rows, ]
 
   fpdf <- dplyr::mutate(fpdf,
             tier = dplyr::case_when(
