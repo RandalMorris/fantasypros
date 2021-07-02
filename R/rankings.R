@@ -53,12 +53,12 @@ fp_draft_rankings <- function(pos = c("ALL","QB","RB","WR","TE"), scoring = c("H
   #x_api_key="zjxN52G3lP4fORpHRftGI2mTU8cTwxVNvkjByM3j"
   #authorization = "Basic WC1BcGktS2V5OnpqeE41MkczbFA0Zk9ScEhSZnRHSTJtVFU4Y1R3eFZOdmtqQnlNM2o="
   
-  fp_auth()
+  fp_auth <- fp_auth()
   fp_url <- fp_build_url(year = year, type = type, scoring = scoring, pos = pos, week = week)
     
-  res = httr::GET(fp_url,httr::add_headers("user-agent" = user_agent,
-                                  "x-api-key" = x_api_key,
-                                  "Authorization" = authorization))
+  res = httr::GET(fp_url,httr::add_headers("user-agent" = fp_auth$user_agent,
+                                  "x-api-key" =  fp_auth$x_api_key,
+                                  "Authorization" =  fp_auth$authorization))
   
   raw_data <- httr::content(res, "parsed", "application/json") 
   raw_data <- raw_data[["players"]]
