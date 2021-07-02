@@ -47,12 +47,16 @@ fp_draft_rankings <- function(pos = c("ALL","QB","RB","WR","TE"), scoring = c("H
   if (exists("scoring") == F) scoring <- "ALL" else scoring <- toupper(scoring)
   if (exists("type") == F) type <- "draft" else type <- tolower(type)
   
-  url = paste0("https://api.fantasypros.com/v2/json/nfl/",year,"/consensus-rankings?type=",type,
-               "&scoring=",scoring,"&position=",pos,"&week=",week,"&experts=available")
-  user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-  x_api_key="zjxN52G3lP4fORpHRftGI2mTU8cTwxVNvkjByM3j"
-  authorization = "Basic WC1BcGktS2V5OnpqeE41MkczbFA0Zk9ScEhSZnRHSTJtVFU4Y1R3eFZOdmtqQnlNM2o="
-  res = httr::GET(url,httr::add_headers("user-agent" = user_agent,
+  #url = paste0("https://api.fantasypros.com/v2/json/nfl/",year,"/consensus-rankings?type=",type,
+  #             "&scoring=",scoring,"&position=",pos,"&week=",week,"&experts=available")
+  #user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+  #x_api_key="zjxN52G3lP4fORpHRftGI2mTU8cTwxVNvkjByM3j"
+  #authorization = "Basic WC1BcGktS2V5OnpqeE41MkczbFA0Zk9ScEhSZnRHSTJtVFU4Y1R3eFZOdmtqQnlNM2o="
+  
+  fp_auth()
+  fp_build_url(type = type, scoring = scoring, pos = pos, week = week)
+  cat(fp_url)
+  res = httr::GET(fp_url,httr::add_headers("user-agent" = user_agent,
                                   "x-api-key" = x_api_key,
                                   "Authorization" = authorization))
   
