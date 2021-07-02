@@ -62,9 +62,7 @@ fp_draft_rankings <- function(pos = c("ALL","QB","RB","WR","TE"), scoring = c("H
   data <- data.frame(t(sapply(raw_data,c)))
   data <- janitor::clean_names(data)
   fp_draft_rankings <- tibble::as_tibble(data)
-  fp_draft_rankings
+  return(fp_draft_rankings)
 }
 
 fp_draft_rankings()
-pos="qb";scoring="std";year=2021;type="draft";week=0
-
