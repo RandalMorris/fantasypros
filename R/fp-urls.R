@@ -1,69 +1,21 @@
-fp_build_query_list <- function(season     = NULL,
-                                range      = NULL,
-                                start_week = NULL,
-                                end_week   = NULL,
-                                scoring    = NULL,
-                                snaps      = NULL,
-                                show       = NULL,
-                                format     = NULL
-) {
+#New Code to query FantasyPros Data
 
-  if (!is.null(scoring)) scoring <- toupper(scoring)
 
-  query_list <- list(
-    year    = season,
-    range   = range,
-    start   = start_week,
-    end     = end_week,
-    scoring = scoring,
-    snaps   = snaps,
-    show    = show,
-    format  = format
-  )
-  query_list
+fp_auth <- function() { 
+  user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+  x_api_key="zjxN52G3lP4fORpHRftGI2mTU8cTwxVNvkjByM3j"
+  authorization = "Basic WC1BcGktS2V5OnpqeE41MkczbFA0Zk9ScEhSZnRHSTJtVFU4Y1R3eFZOdmtqQnlNM2o="
+
 }
 
+fp_build_url <- function(base = "https://api.fantasypros.com/v2/json/nfl/", type, scoring,pos,week){
 
-fp_build_url <- function(base = "https://www.fantasypros.com", path_list = NULL){
-  fp_url <- httr::parse_url(base)
-  fp_url$path <- path_list
+  fp_url <- paste0(base,year,"/consensus-rankings?type=",type,
+               "&scoring=",scoring,"&position=",pos,"&week=",week,"&experts=available")
 
   fp_url
 }
-
-fp_format_pos_path <- function(pos = NULL) {
-
-  if (is.null(pos)) return("")
-
-  pos <- tolower(pos)
-  pos_path <- switch(pos,
-                     "offense" = "",
-                     "off"     = "",
-                     "overall" = "",
-                     "qb"      = "qb.php",
-                     "rb"      = "rb.php",
-                     "wr"      = "wr.php",
-                     "te"      = "te.php",
-                     "k"       = "k.php",
-                     "dst"     = "dst.php",
-                     "idp"     = "idp.php",
-                     "def"     = "defense.php",
-                     "defense" = "defense.php",
-                     "dl"      = "dl.php",
-                     "lb"      = "lb.php",
-                     "db"      = "db.php")
-
-  if (is.null(pos_path)) {
-    warning(
-      paste("position", pos, "not recognized. Defaulting to offense only."),
-      call. = FALSE
-    )
-    pos_path <- ""
-  }
-
-  pos_path
-}
-
+####OLD CODDE#####
 fp_get_data <- function(url, skip_parse_cols = c("Player", "Pos", "Team")) {
   fp_html <- xml2::read_html(url)
   fpdf <- rvest::html_table(fp_html)[[1]]
@@ -78,36 +30,6 @@ fp_get_data <- function(url, skip_parse_cols = c("Player", "Pos", "Team")) {
 
   tibble::as_tibble(fpdf)
 }
-
-fp_format_rankings_pos_path <- function(scoring, pos) {
-
-  if (is.null(pos)) return("consensus-cheatsheets.php")
-
-  pos <- tolower(pos)
-
-  if (pos == "overall") {
-    pos_path <- switch(scoring,
-                       "std"  = "consensus-cheatsheets.php",
-                       "half" = "half-point-ppr-cheatsheets.php",
-                       "ppr"  = "ppr-cheatsheets.php"
-                       )
-    return(pos_path)
-    }
-
-  if (pos %in% c("rb", "wr", "te")) {
-    if (scoring == "half") pos_prepend <- "half-point-ppr-"
-    else if (scoring == "ppr") pos_prepend <- "ppr-"
-    else pos_prepend <- ""
-  }
-  else{
-  pos_prepend <- ""
-  }
-
-  pos_path <- paste0(pos_prepend, pos, "-cheatsheets.php")
-
-  gsub("\\s", "-", pos_path)
-}
-
 
 fp_get_ranking_data <- function(url, pos) {
 
