@@ -5,6 +5,10 @@ fp_auth <- function() {
   user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
   x_api_key="zjxN52G3lP4fORpHRftGI2mTU8cTwxVNvkjByM3j"
   authorization = "Basic WC1BcGktS2V5OnpqeE41MkczbFA0Zk9ScEhSZnRHSTJtVFU4Y1R3eFZOdmtqQnlNM2o="
+  
+  return(user_agent)
+  return(x_api_key)
+  return(authorization)
 
 }
 
@@ -13,7 +17,7 @@ fp_build_url <- function(base = "https://api.fantasypros.com/v2/json/nfl/", year
   fp_url <- paste0(base,year,"/consensus-rankings?type=",type,
                "&scoring=",scoring,"&position=",pos,"&week=",week,"&experts=available")
 
-  fp_url
+  return(fp_url)
 }
 ####OLD CODDE#####
 fp_get_data <- function(url, skip_parse_cols = c("Player", "Pos", "Team")) {
