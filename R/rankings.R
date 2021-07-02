@@ -37,21 +37,34 @@
 #'
 #' # Individual Defensive Player ECR
 #' fp_draft_rankings(pos = "IDP")
-fp_draft_rankings <- function(pos = "overall", scoring = c("half", "ppr", "std")) {
-
+fp_draft_rankings <- function(pos = c("ALL","QB","RB","WR","TE"), scoring = c("HALF", "PPR", "STD"),
+                              year=2021, 
+                              type="draft",
+                              week=0) {
+  pos <- match.arg(pos)
   scoring <- match.arg(scoring)
-
-  pos_path <- fp_format_rankings_pos_path(scoring = scoring, pos = pos)
-
-  fp_url <- fp_build_url(
-    path_list = list("nfl", "rankings", pos_path)
-  )
-
-  fp_url_string <- httr::build_url(fp_url)
-  fpdf <- fp_get_ranking_data(fp_url_string, pos = pos)
-  fpdf <- tibble::add_column(fpdf,
-                             scoring = scoring,
-                             .before  = "rank")
-
-  fpdf
+  if (exists("pos") == F) pos <- "ALL" else pos <- toupper(pos)
+  if (exists("scoring") == F) scoring <- "ALL" else scoring <- toupper(scoring)
+  if (exists("type") == F) type <- "draft" else type <- tolower(type)
+  
+  url = paste0("https://api.fantasypros.com/v2/json/nfl/",year,"/consensus-rankings?type=",type,
+               "&scoring=",scoring,"&position=",pos,"&week=",week,"&experts=available")
+  print(url)
+  user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+  x_api_key="zjxN52G3lP4fORpHRftGI2mTU8cTwxVNvkjByM3j"
+  authorization = "Basic WC1BcGktS2V5OnpqeE41MkczbFA0Zk9ScEhSZnRHSTJtVFU4Y1R3eFZOdmtqQnlNM2o="
+  res = httr::GET(url,add_headers("user-agent" = user_agent,
+                                  "x-api-key" = x_api_key,
+                                  "Authorization" = authorization))
+  
+  raw_data <- content(res, "parsed", "application/json") 
+  raw_data <- raw_data[["players"]]
+  data <- data.frame(t(sapply(raw_data,c)))
+  data <- janitor::clean_names(data)
+  fp_draft_rankings <- tibble::as_tibble(data)
+  fp_draft_rankings
 }
+
+fp_draft_rankings()
+pos="qb";scoring="std";year=2021;type="draft";week=0
+
