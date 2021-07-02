@@ -60,8 +60,5 @@ fp_draft_rankings <- function(pos = c("ALL","QB","RB","WR","TE"), scoring = c("H
   raw_data <- raw_data[["players"]]
   data <- data.frame(t(sapply(raw_data,c)))
   data <- janitor::clean_names(data)
-  fp_draft_rankings <- tibble::as_tibble(data)
-  return(fp_draft_rankings)
+  fp_draft_rankings <<- tibble::as_tibble(data)
 }
-
-fp_draft_rankings()
