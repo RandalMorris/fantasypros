@@ -54,8 +54,10 @@ fp_draft_rankings <- function(pos = c("ALL","QB","RB","WR","TE"), scoring = c("H
   #authorization = "Basic WC1BcGktS2V5OnpqeE41MkczbFA0Zk9ScEhSZnRHSTJtVFU4Y1R3eFZOdmtqQnlNM2o="
   
   fp_auth()
-  fp_build_url(type = type, scoring = scoring, pos = pos, week = week)
+  fp_build_url(year = year, type = type, scoring = scoring, pos = pos, week = week)
+  
   cat(fp_url)
+  
   res = httr::GET(fp_url,httr::add_headers("user-agent" = user_agent,
                                   "x-api-key" = x_api_key,
                                   "Authorization" = authorization))
