@@ -39,7 +39,7 @@
 #' fp_draft_rankings(pos = "IDP")
 fp_draft_rankings <- function(pos = c("ALL","QB","RB","WR","TE"), scoring = c("HALF", "PPR", "STD"),
                               year=2021, 
-                              type="draft",
+                              type=c("both","draft","adp"),
                               week=0) {
   pos <- match.arg(pos)
   scoring <- match.arg(scoring)
@@ -65,4 +65,20 @@ fp_draft_rankings <- function(pos = c("ALL","QB","RB","WR","TE"), scoring = c("H
   data <- data.frame(t(sapply(raw_data,c)))
   data <- janitor::clean_names(data) %>% as_tibble()
   return(data)
+  
+  
 }
+
+'
+data_ecr <- fp_draft_rankings(pos="QB") %>% 
+  dplyr::select(player = player_name, id = player_id, team = player_team_id, position = player_position_id,
+         ecr_tier = tier,  ecr_pos_rank = pos_rank, ecr_rank = rank_ecr, ecr_min = rank_min, ecr_ecr_max = rank_max, ecr_rank_avg = rank_ave, ecr_rank_std = rank_std)
+data_ecr <- as.data.frame(lapply(data_ecr,unlist))
+
+data_adp <- fp_draft_rankings(pos="QB", type="adp") %>% 
+  dplyr::select(id = player_id,
+         adp_tier = tier,  adp_pos_rank = pos_rank, adp_rank = rank_ecr, adp_min = rank_min, adp_max = rank_max, adp_rank_avg = rank_ave, adp_rank_std =rank_std)
+data_adp <- as.data.frame(lapply(data_adp,unlist))
+
+
+fp_draft_rankings <- dplyr::inner_join(data_ecr, data_adp, by = "id")'
