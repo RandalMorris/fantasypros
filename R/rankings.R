@@ -57,7 +57,7 @@ fp_draft_rankings <- function(pos = c("ALL","QB","RB","WR","TE"), scoring = c("H
                                   "x-api-key" = x_api_key,
                                   "Authorization" = authorization))
   
-  raw_data <- content(res, "parsed", "application/json") 
+  raw_data <- httr::content(res, "parsed", "application/json") 
   raw_data <- raw_data[["players"]]
   data <- data.frame(t(sapply(raw_data,c)))
   data <- janitor::clean_names(data)
