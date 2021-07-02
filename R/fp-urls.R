@@ -8,7 +8,7 @@ fp_auth <- function() {
 
 }
 
-fp_build_url <- function(base = "https://api.fantasypros.com/v2/json/nfl/", type, scoring,pos,week){
+fp_build_url <- function(base = "https://api.fantasypros.com/v2/json/nfl/", year, type, scoring, pos, week){
 
   fp_url <- paste0(base,year,"/consensus-rankings?type=",type,
                "&scoring=",scoring,"&position=",pos,"&week=",week,"&experts=available")
