@@ -48,7 +48,7 @@ fp_draft_rankings <- function(pos = c("ALL","QB","RB","WR","TE"), scoring = c("H
   if (exists("scoring") == F) scoring <- "ALL" else scoring <- toupper(scoring)
   if (exists("type") == F) type <- "draft" else type <- tolower(type)
   
-  fp_ranking_data <- fp_get_ranking_data(pos, scoring, year, type, week)
+  fp_ranking_data <- fp_get_ranking_data(pos=pos, scoring=scoring, year=year, type=type, week=week)
   
   
  }
