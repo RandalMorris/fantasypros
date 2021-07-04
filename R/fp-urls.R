@@ -28,7 +28,7 @@ fp_get_ranking_data <- function(year, type, scoring, pos, week) {
       sapply(c) %>% t() %>% data.frame() %>% janitor::clean_names() %>% as_tibble() %>% 
       dplyr::select(player = player_name, id = player_id, team = player_team_id, position = player_position_id,
       ecr_tier = tier,  ecr_pos_rank = pos_rank, ecr_rank = rank_ecr, ecr_min = rank_min, 
-      ecr_max = rank_max, ecr_rank_avg = rank_ave, ecr_rank_std = rank_std) %>%
+      ecr_max = rank_max, ecr_rank_avg = rank_ave, ecr_rank_std = rank_std) %>% mutate(as.numeric(ecr_rank_avg), as.numeric(.$ecr_rank_std)) %>%
       lapply(unlist) %>% 
       as.data.frame()
 
@@ -54,7 +54,7 @@ fp_get_ranking_data <- function(year, type, scoring, pos, week) {
         sapply(c) %>% t() %>% data.frame() %>% janitor::clean_names() %>% as_tibble() %>% 
         dplyr::select(player = player_name, id = player_id, team = player_team_id, position = player_position_id,
         ecr_tier = tier,  ecr_pos_rank = pos_rank, ecr_rank = rank_ecr, ecr_min = rank_min, 
-        ecr_ecr_max = rank_max, ecr_rank_avg = rank_ave, ecr_rank_std = rank_std) %>%
+        ecr_ecr_max = rank_max, ecr_rank_avg = rank_ave, ecr_rank_std = rank_std) %>% mutate(as.numeric(ecr_rank_avg), as.numeric(.$ecr_rank_std)) %>% 
         lapply(unlist) %>% 
         as.data.frame()
 
