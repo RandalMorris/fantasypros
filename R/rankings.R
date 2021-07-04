@@ -42,6 +42,7 @@ fp_draft_rankings <- function(pos = c("ALL","QB","RB","WR","TE"), scoring = c("H
                               type=c("both","draft","adp"),
                               week=0) {
   pos <- match.arg(pos)
+  type <- match.arg(type)
   scoring <- match.arg(scoring)
   if (exists("pos") == F) pos <- "ALL" else pos <- toupper(pos)
   if (exists("scoring") == F) scoring <- "ALL" else scoring <- toupper(scoring)
