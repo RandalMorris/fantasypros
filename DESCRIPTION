@@ -10,7 +10,7 @@ Description: The goal of the fantasypros R package is to provide easy and reprod
     provided on the fantasypros website. The intital focus is on
     NFL and fantasy football data, but other sports are planned to be added
 License: MIT + file LICENSE
-Imports: 
+Depends:
     dplyr,
     httr,
     jsonlite,
@@ -23,4 +23,4 @@ Imports:
     xml2
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
