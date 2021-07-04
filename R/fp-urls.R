@@ -59,6 +59,7 @@ fp_get_ranking_data <- function(year, type, scoring, pos, week) {
         as.data.frame()
 
   } else if (type == "adp") {
+      fp_url <- fp_build_url(year = year, type = "adp", scoring = scoring, pos = pos, week = week)
       fp_draft_rankings <- httr::GET(fp_url,httr::add_headers("user-agent" = fp_auth$user_agent,
                                                               "x-api-key" =  fp_auth$x_api_key,
                                                               "Authorization" =  fp_auth$authorization)) %>% 
