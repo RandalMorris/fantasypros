@@ -34,10 +34,11 @@
 #'
 #' # TE ECR using standard scoring
 #' fp_draft_rankings(pos = "TE", scoring = "std")
-#'
+#'"Team QB","Team RB","Team WR","Team TE","Team K","Team OL","COACH"), 
 #' # Individual Defensive Player ECR
 #' fp_draft_rankings(pos = "IDP")
-fp_draft_rankings <- function(pos = c("ALL","QB","RB","WR","TE"), scoring = c("HALF", "PPR", "STD"),
+fp_draft_rankings <- function(pos = c("ALL","QB","RB","WR","TE","K","DST","IDP","DL","LB","DB"),
+                                     scoring = c("HALF", "PPR", "STD"),
                               year=2021, 
                               type=c("both","draft","adp"),
                               week=0) {
