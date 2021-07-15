@@ -9,15 +9,9 @@
 #'             \item \code{"TE"}
 #'             \item \code{"K"}
 #'             \item \code{"DST"}
-#'             \item \code{"DL"}
-#'             \item \code{"LB"}
-#'             \item \code{"DB"}
 #'            }
 #' @param season \code{Numeric}. The NFL season. If missing it will return the current year's season.
-#'               Supported season only go back to \code{2015}
-#' @param start_week \code{Numeric}. The starting week. Default is \code{1}
-#' @param end_week \code{Numeric}. The ending week. Default is \code{17}
-#' @param scoring \code{Charcater}. Fantasy scoring format. Default is \code{"half"}
+#'               Supported season only go back to \code{2013}
 #'
 #' @return a tibble
 #' @export
@@ -28,50 +22,74 @@
 #'
 #' @examples
 #'
-#' # overall fantasy points for the entire season
-#' fp_stats("RB", season = 2018)
+#' Stats_QB <- fp_get_stats_pos("qb")
+#' Stats_RB <- fp_get_stats_pos("rb")
+#' Stats_WR <- fp_get_stats_pos("wr")
+#' Stats_TE <- fp_get_stats_pos("te")
+#' Stats_K <- fp_get_stats_pos("k")
+#' Stats_DST <- fp_get_stats_pos("dst")
 #'
-#' # TE's in the 2017 season using standard scoring
-#' fp_stats(pos = "TE", season = 2017, scoring = "std")
-#'
-fp_stats <- function(pos = "QB", season, start_week = 1, end_week = 17,
-                              scoring = c("half", "ppr", "std")) {
+fp_get_stats_data <- function(pos=c("qb", "rb", "wr", "te", "k"), 
+                              season = c(2013,2014,2015,2016,2017,2018,2019,2020)) {
+  
+  base_url="https://www.fantasypros.com/nfl/stats/"
 
-  scoring <- match.arg(scoring)
-  if (missing(season)) season <- as.numeric(format(Sys.Date(), "%Y"))
+  url=paste0(base_url,pos,".php?&year=",season)
+  cat(paste0("Scraping ", toupper(pos), " Season Stats from"), url, sep = "\n  ")
+  
+  fp_html <- xml2::read_html(url)
+  fpdf <- rvest::html_table(fp_html, fill = TRUE)[[1]]
+  
+  if (pos %in% c("qb", "rb", "wr", "te")) {
+    first_row_names <- fpdf[1 , ]
+    second_row_names <- fpdf[2 , ]
+    
+    new_row_names <- paste(first_row_names, second_row_names, sep = "_")
+    new_row_names <- gsub("^_|MISC_", "", new_row_names, ignore.case = TRUE)
+    
+    fpdf <- fpdf[3:nrow(fpdf), ]
+    names(fpdf) <- new_row_names
+  }
+  
+  fpdf$player <- gsub("\\s\\(.*", "", fpdf$Player, perl = TRUE)
+  fpdf$team <- gsub(".*\\s|\\(|\\)", "", fpdf$Player)
+  fpdf$pos <- toupper(pos)
+  fpdf$Player <- NULL
+  fpdf$Season <- season
+    
+  # this gets columns that are already numbers
+  num_cols <- which(grepl("player|team|pos", names(fpdf), ignore.case = TRUE))
+  already_numeric <- which(sapply(1:ncol(fpdf), function(i) class(fpdf[, i])) != "character")
+  
+  num_cols <- sort(unique(c(num_cols, already_numeric)))
+  num_cols <- setdiff(1:ncol(fpdf), num_cols)
+  num_cols <- names(fpdf)[num_cols]
+  fpdf[num_cols][] <- lapply(fpdf[num_cols], readr::parse_number)
+  
+  if (pos != "dst"){ fpdf$fantasypro_id <- tolower(gsub(" ", "-", fpdf$player))
+  } else { fpdf$fantasypro_id <- tolower(paste0(gsub("([A-Za-z]+).*", "\\1", fpdf$player),"-defense")) } 
+  
+  
+  
+  fpdf <- dplyr::select(fpdf, Season, player, fantasypro_id, pos, team, dplyr::everything()) %>% janitor::clean_names() 
 
-  fp_query_list <- fp_build_query_list(
-    season     = season,
-    range      = "custom",
-    start_week = start_week,
-    end_week   = end_week,
-    scoring    = scoring
-  )
+  fpdf$player <- fpdf$player %>% gsub("II","", .) %>% gsub("III","", .) %>% gsub("IIII","", .) %>% gsub("JR","", .)
+  fpdf <- as_tibble(fpdf)
+}
 
-  # The stats url is start_week and end_week.
-  # This is different then the others that are just start and end.
-  start_index <- which(names(fp_query_list) == "start")
-  names(fp_query_list)[start_index] <- "start_week"
 
-  end_index <- which(names(fp_query_list) == "end")
-  names(fp_query_list)[end_index] <- "end_week"
+fp_get_stats_pos <- function(pos) {
+  #retrieve stats for year by selected pos
+  FP_2013 <- fp_get_stats_data(pos, 2013)
+  FP_2014 <- fp_get_stats_data(pos, 2014)
+  FP_2015 <- fp_get_stats_data(pos, 2015)
+  FP_2016 <- fp_get_stats_data(pos, 2016)
+  FP_2017 <- fp_get_stats_data(pos, 2017)
+  FP_2018 <- fp_get_stats_data(pos, 2018)
+  FP_2019 <- fp_get_stats_data(pos, 2019)
+  FP_2020 <- fp_get_stats_data(pos, 2020)
+  
+  #combine data to 1 set
+  out <- rbind(FP_2013, FP_2014, FP_2015, FP_2016, FP_2017, FP_2018, FP_2019, FP_2020) %>% filter(team != "FA")
 
-  pos_path <- fp_format_pos_path(pos)
-
-  fp_url <- fp_build_url(
-    path_list = list("nfl", "stats", pos_path)
-  )
-
-  fp_url$query <- fp_query_list
-  fp_url_string <- httr::build_url(fp_url)
-  fpdf <- fp_get_stats_data(fp_url_string, pos = tolower(pos))
-
-  fpdf <- tibble::add_column(fpdf,
-                             season     = season,
-                             start_week = start_week,
-                             end_week   = end_week,
-                             scoring    = scoring,
-                             .after     = "team")
-
-  fpdf
 }
